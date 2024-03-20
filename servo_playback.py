@@ -56,9 +56,11 @@ def worker():
                         print('servo {}  position={}'.format(address, data[1] * 256 + data[2]))
                         current_position[address * 2] = data[1]
                         current_position[address * 2 + 1] = data[2]
+                    else:
+                        print('Bad Status servo {}  position={}'.format(address, data[1] * 256 + data[2]))
 
                     #if address == 0xFE:
-                    #print('Captured addr={0:02x} len={1:02x} data={2}'.format(address, expected_data_len, data))
+                    print('Captured addr={0:02x} len={1:02x} data={2}'.format(address, data_len, data))
                 if key_press == 's':
                     print("Saved")
                     with open(file_name + str(capture_count) + '.pkl', 'wb') as f:
@@ -132,36 +134,38 @@ p1 = array.array('B', [254, 50, 254,
 1, 130, 
 1, 205, 
 1, 205])  # , 168
-p2 = array.array('B', [254, 50, 254, 
-1, 211, # ch0
-1, 25, 
-1, 109, 
-1, 190, 
-2, 144, 
-1, 253, 
-2, 243, # ch6 left arm
-0, 194, 
-1, 181, 
-1, 190, 
-1, 181, 
-1, 229, 
-2, 192, 
-2, 15, 
-0, 212, 
-1, 127, 
-1, 231, # ch16
-1, 205, 
-1, 205, 
-1, 205, 
-1, 130, 
-1, 130, 
-1, 205, 
-1, 205])  # , 168
-#p2 = array.array('B', [254, 50, 254, 2, 108, 2, 72, 0, 212, 1, 37, 1, 94, 2, 153, 3, 17, 0, 164, 1, 196, 1, 208, 1, 166, 1, 211, 2, 195, 2, 150, 0, 212, 0, 248, 1, 205, 1, 205, 1, 205, 1, 205, 1, 130, 1, 130, 1, 205, 1, 205])  # , 166
+#p2 = array.array('B', [254, 50, 254, 
+#1, 211, # ch0
+#1, 25, 
+#1, 109, 
+#1, 190, 
+#2, 144, 
+#1, 253, 
+#2, 243, # ch6 left arm
+#0, 194, 
+#1, 181, 
+#1, 190, 
+#1, 181, 
+#1, 229, 
+#2, 192, 
+#2, 15, 
+#0, 212, 
+#1, 127, 
+#1, 231, # ch16
+#1, 205, 
+#1, 205, 
+#1, 205, 
+#1, 130, 
+#1, 130, 
+#1, 205, 
+#1, 205])  # , 168
+p2 = array.array('B', [254, 50, 254, 2, 108, 2, 72, 0, 212, 1, 37, 1, 94, 2, 153, 3, 17, 0, 164, 1, 196, 1, 208, 1, 166, 1, 211, 2, 195, 2, 150, 0, 212, 0, 248, 1, 205, 1, 205, 1, 205, 1, 205, 1, 130, 1, 130, 1, 205, 1, 205])  # , 166
 #p3 = array.array('B', [254, 50, 254, 2, 210, 2, 249, 0, 140, 0, 191, 0, 176, 2, 222, 2, 213, 0, 224, 1, 196, 1, 205, 1, 166, 1, 214, 2, 222, 1, 211, 0, 182, 1, 187, 1, 211, 1, 205, 1, 205, 1, 205, 1, 130, 1, 130, 1, 205, 1, 205])  # , 166
 initialize = array.array('B', [0xFA, 2, 7])  # , 3
 enable = array.array('B', [0xFE, 3, 2, 1])  # , 4
 disable = array.array('B', [0xFE, 3, 2, 0])
+special = array.array('B', [0xFA, 0x03, 0x08, 0x00])
+special2 = array.array('B', [0x16, 0x05, 0x09, 0x01, 0x01, 0xCD])
 
 packets = [
 array.array('B', [0xFA, 0x03, 0x08, 0x00]), # , 0x05
@@ -198,7 +202,12 @@ def position(data):
 
 position(initialize)
 time.sleep(0.300)
-position(disable)
+#position(disable)
+#time.sleep(0.002)
+position(enable)
+time.sleep(0.002)
+position(special)
+position(special2)
 time.sleep(0.002)
 if True:
     channel = 0
@@ -206,7 +215,7 @@ if True:
         # responses seem to respond with 0xAx so 0x03 => 0xA3
         test = array.array('B', [channel, 0x02, 0x03])  # expect response about 0.28ms 0, 4, A3, 1, F4, 9C
         position(test)
-        time.sleep(0.005)
+        time.sleep(0.0020)
         #
         #test = array.array('B', [channel, 0x02, 0x07])  # Not sure
         #position(test)
@@ -215,17 +224,15 @@ if True:
         if channel > 16:
             channel = 0
 
-position(enable)
-time.sleep(0.002)
 #for p in packets:
 #    position(p)
 #    time.sleep(0.005)
 
 while True:
-    position(current_position)
-    time.sleep(1.10)
+    #position(current_position)
+    #time.sleep(1.10)
     position(p1)
     time.sleep(1.10)
-    position(p2)
-    time.sleep(1.10)
+    #position(p2)
+    #time.sleep(1.10)
 
